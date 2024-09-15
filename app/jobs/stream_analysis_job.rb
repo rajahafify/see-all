@@ -2,7 +2,7 @@ require 'net/http'
 require 'open3'
 require 'json'
 
-class RealTimeAnalysisJob < ApplicationJob
+class StreamAnalysisJob < ApplicationJob
   queue_as :default
 
   def perform(stream_key)
