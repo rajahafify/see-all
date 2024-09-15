@@ -15,7 +15,7 @@ class StreamsController < ApplicationController
       head :bad_request
       return
     end
-    RealTimeAnalysisJob.perform_later(stream_key)
+    StreamAnalysisJob.perform_later(stream_key)  # Updated job reference
     render plain: 'OK', status: :ok
   end
 
