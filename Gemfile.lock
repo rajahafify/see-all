@@ -97,6 +97,11 @@ GEM
     ethon (0.16.0)
       ffi (>= 1.15.0)
     event_stream_parser (1.0.0)
+    factory_bot (6.5.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.4.3)
+      factory_bot (~> 6.4)
+      railties (>= 5.0.0)
     faraday (2.11.0)
       faraday-net_http (>= 2.0, < 3.4)
       logger
@@ -296,6 +301,7 @@ DEPENDENCIES
   bootsnap
   byebug
   debug
+  factory_bot_rails
   gemini-ai (~> 4.2.0)
   importmap-rails
   jbuilder

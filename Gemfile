@@ -47,7 +47,6 @@ gem "bootsnap", require: false
 gem 'sidekiq'
 gem 'rack', '~> 2.2'
 gem 'streamio-ffmpeg'
-gem 'byebug'
 
 gem 'gemini-ai', '~> 4.2.0'
 
@@ -73,3 +72,7 @@ end
 gem "mime-types", "~> 3.5"
 
 gem "multipart-post", "~> 2.4"
+
+group :test do
+  gem 'factory_bot_rails'
+end
