@@ -27,6 +27,19 @@ services:
       - redis
     networks:
       - my_network
+    develop:
+      watch:
+        - path: .
+          target: /app
+          ignore:
+            - node_modules/
+          action: sync  # Added action here
+        - path: Gemfile
+          target: /app/Gemfile
+          action: sync  # Added action here
+        - path: Gemfile.lock
+          target: /app/Gemfile.lock
+          action: sync  # Added action here
 
   sidekiq:
     build: .
@@ -41,6 +54,19 @@ services:
       - redis
     networks:
       - my_network
+    develop:
+      watch:
+        - path: .
+          target: /app
+          ignore:
+            - node_modules/
+          action: sync  # Added action here
+        - path: Gemfile
+          target: /app/Gemfile
+          action: sync  # Added action here
+        - path: Gemfile.lock
+          target: /app/Gemfile.lock
+          action: sync  # Added action here
 
   redis:
     image: redis:6-alpine
