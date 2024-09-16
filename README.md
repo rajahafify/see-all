@@ -1,6 +1,6 @@
 # See All
 
-See all is a web application that allows users to analyze and transcribe live video streams using AI services.
+See All is a web application that allows users to analyze and transcribe live video streams using AI services. It enables streamers to broadcast using OBS and interact with an AI that provides real-time feedback and advice about their stream, such as gaming tips for specific video games.
 
 ## Getting Started
 
@@ -23,6 +23,80 @@ Docker and Docker Compose are required to run the project.
    ```bash
    docker-compose up --build
    ```
+
+## Design Document
+
+### Architecture Overview
+
+See All is built using a microservices architecture with the following main components:
+
+1. Web Application (Rails)
+2. RTMP Server (Nginx-RTMP)
+3. Stream Processing Service
+4. AI Interaction Service
+5. WebSocket Server (Action Cable)
+6. Database (PostgreSQL)
+7. Job Queue (Sidekiq + Redis)
+
+### Key Components
+
+1. **Web Application**
+   - Handles user authentication and stream management
+   - Provides UI for streamers to interact with AI
+   - Manages WebSocket connections for real-time updates
+
+2. **RTMP Server**
+   - Receives video streams from OBS
+   - Forwards streams to the Stream Processing Service
+
+3. **Stream Processing Service**
+   - Generates frames from incoming video streams
+   - Analyzes frames for game detection and other relevant information
+
+4. **AI Interaction Service**
+   - Processes stream data and user queries
+   - Generates relevant responses and advice using AI models
+   - Integrates with external AI APIs (e.g., OpenAI GPT)
+
+5. **WebSocket Server**
+   - Facilitates real-time communication between the web app and AI service
+
+6. **Database**
+   - Stores user information, stream metadata, and interaction history
+
+7. **Job Queue**
+   - Manages background jobs for stream processing and AI interactions
+
+### Planned Features
+
+1. User authentication and stream key management
+2. Real-time video streaming using OBS
+3. Automatic game detection from video streams
+4. AI-powered game advice and interaction
+5. Real-time chat between streamer and AI
+6. Stream recording and playback
+7. Analytics dashboard for streamers
+
+### Data Flow
+
+1. Streamer starts a broadcast using OBS
+2. RTMP server receives the stream and notifies the web application
+3. Stream Processing Service begins generating and analyzing frames
+4. AI Interaction Service processes stream data and awaits user queries
+5. Streamer interacts with AI through the web interface
+6. WebSocket server facilitates real-time communication between components
+7. AI responses are sent back to the streamer in real-time
+
+### Technology Stack
+
+- Backend: Ruby on Rails
+- Frontend: HTML, CSS, JavaScript (with Stimulus.js)
+- Streaming: Nginx-RTMP
+- AI Integration: OpenAI GPT API (or similar)
+- Database: PostgreSQL
+- Job Queue: Sidekiq
+- Caching: Redis
+- Containerization: Docker
 
 ## Contributing
 
