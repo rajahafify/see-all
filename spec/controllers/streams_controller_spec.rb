@@ -16,8 +16,10 @@ RSpec.describe StreamsController, type: :controller do
   end
 
   describe "POST #stop" do
+    let!(:stream) { create(:stream, stream_key: 'test_stream') } # Create a stream for the test
+
     it "returns http success" do
-      post :stop
+      post :stop, params: { name: 'test_stream' }
       expect(response).to have_http_status(:success)
     end
   end
