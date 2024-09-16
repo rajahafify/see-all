@@ -1,0 +1,22 @@
+<h1>Streams</h1>
+
+<table>
+    <% @streams.each do |stream| %>
+        <tr>
+            <td>
+                <%= stream.frames.count %>
+            </td>
+            <td>
+                <%= Redis.new.get("stop_job_#{stream.id}").present? ? "true" : "false" %>
+            </td>
+                <% stream.frames.first(5).each do |frame| %>
+                    <td>
+                <%= image_tag frame, size: "100x100" %>
+                </td>
+            <% end %>
+            <td>
+                <%= link_to stream.stream_key, stream_path(stream) %>
+            </td>
+        </tr>
+    <% end %>
+</table>

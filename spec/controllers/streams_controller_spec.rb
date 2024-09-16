@@ -21,4 +21,20 @@ RSpec.describe StreamsController, type: :controller do
       expect(response).to have_http_status(:success)
     end
   end
+
+  describe "GET #show" do
+    let!(:stream) { create(:stream, stream_key: 'test_stream') }
+
+    it "returns http success" do
+      get :show, params: { id: stream.id }
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "GET #index" do
+    it "returns http success" do
+      get :index
+      expect(response).to have_http_status(:success)
+    end
+  end
 end

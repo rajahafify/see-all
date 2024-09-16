@@ -7,7 +7,6 @@ class StreamAnalysisJob < ApplicationJob
 
   def perform(stream_key)
     puts "Performing analysis for stream_key: #{stream_key}" # Debugging output
-    stream_url = "rtmp://nginx/stream/#{stream_key}"
 
     puts "Real-time analysis started for stream: #{stream_key}"
 
@@ -18,14 +17,6 @@ class StreamAnalysisJob < ApplicationJob
 
   private
 
-  def analyze_stream(url, stream_key)
-    puts "Analyzing stream at #{url}" # Debugging output
-    stream = Stream.new(stream_key: stream_key) # Use stream_key for the Stream instance
-    if stream.save
-      Stream.generate_frames_from_url(url, stream)
-      puts "Stream created successfully: #{stream.inspect}" # Debugging output
-    else
-      puts "Failed to create Stream: #{stream.errors.full_messages}" # Debugging output
-    end
+  def analyze_stream(url, stream_k)
   end
 end

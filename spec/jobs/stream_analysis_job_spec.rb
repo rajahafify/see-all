@@ -3,9 +3,12 @@ require 'rails_helper'
 RSpec.describe StreamAnalysisJob, type: :job do
   let(:stream_key) { 'test_stream' }
   let(:stream_url) { "rtmp://nginx/stream/#{stream_key}" }
+  let(:stream) { instance_double(Stream) }
 
   before do
-    allow(Stream).to receive(:generate_frames_from_url).and_return(true) # Mocking FFmpeg call
+    allow(Stream).to receive(:new).and_return(stream)
+    allow(stream).to receive(:generate_frames_from_stream).and_return(true)
+    allow(stream).to receive(:save).and_return(true)
   end
 
   describe '#perform' do
@@ -24,16 +27,12 @@ RSpec.describe StreamAnalysisJob, type: :job do
     end
 
     it 'captures stream data and saves a new Stream record' do
-      expect {
-        subject.perform(stream_key)
-      }.to change(Stream, :count).by(1) # Check if this line is reached
+      expect(stream).to receive(:save)
+      subject.perform(stream_key)
     end
 
     it 'generates frames from the stream URL' do
-      stream = instance_double(Stream)
-      allow(Stream).to receive(:new).and_return(stream)
-      allow(stream).to receive(:save).and_return(true)
-      expect(Stream).to receive(:generate_frames_from_url).with(stream_url, stream)
+      expect(stream).to receive(:generate_frames_from_stream).with(stream_url)
       subject.perform(stream_key)
     end
   end

@@ -6,55 +6,34 @@ class Stream < ApplicationRecord
   has_many_attached :frames
   validates :stream_key, presence: true
 
-  def self.generate_frames_from_url(url, stream)
-    return unless url.present?
-    
-    # Build the command as an array to prevent shell injection
-    command = [
-      'ffmpeg',
-      '-i', url,
-      '-vf', 'fps=1,scale=1920:1080,crop=1920:1080', # Crop to 1080p
-      '-f', 'image2pipe',
-      '-vcodec', 'png',
-      '-'
-    ]
+  def generate_frames_from_stream
+    url = "rtmp://nginx/stream/#{stream_key}"
+    output_directory = "tmp/frames/#{id}"  # Use stream ID to ensure uniqueness
+    FileUtils.mkdir_p(output_directory)    # Create the directory if it doesn't exist
 
-    # Use Open3 to run ffmpeg and read stdout
-    Open3.popen3(*command) do |stdin, stdout, stderr, wait_thr|
-      # Read each frame from stdout and attach it to the stream
-      while (frame_data = stdout.read(1920 * 1080 * 3)) # Adjust buffer size as needed
-        break if frame_data.empty? # Exit if no more data
-
-        # Create a temporary file for each frame
-        temp_frame_file = Tempfile.new(['frame', '.png'])
-        File.open(temp_frame_file.path, 'wb') do |file|
-          file.write(frame_data)
+    GenerateFramesJob.perform_later(id, url, output_directory)
+    AttachFramesJob.perform_later(id, output_directory)
+  end
+  
+  def attach_generated_frames_to_stream(output_directory)
+    # Get a list of the PNG files in the output directory for this stream
+    Dir.glob("#{output_directory}/frame_*.png").sort.each_with_index do |file_path, index|
+      puts "Filename exists: #{frames.joins(:blob).where(active_storage_blobs: {filename: File.basename(file_path)}).exists?}"
+      unless frames.joins(:blob).where(active_storage_blobs: {filename: File.basename(file_path)}).exists?
+        File.open(file_path, 'rb') do |file|
+          frames.attach(
+            io: file,
+            filename: File.basename(file_path),
+            content_type: 'image/png'
+          )
         end
-
-        # Attach the generated frame to the stream
-        stream.frames.attach(
-          io: File.open(temp_frame_file.path),
-          filename: "frame_#{Time.now.to_i}.png",
-          content_type: 'image/png'
-        )
-
-        # Clean up the temporary frame file
-        temp_frame_file.close
-        temp_frame_file.unlink
-      end
-
-      # Check for errors
-      unless wait_thr.value.success?
-        error_message = stderr.read
-        Rails.logger.error "FFmpeg error: #{error_message}"
-        raise "FFmpeg error: #{error_message}"
       end
     end
   end
 
-  def png_frames
-    frames.joins(:blob).where(active_storage_blobs: { content_type: 'image/png' }).map do |frame|
-      frame.filename.to_s # This will return the binary data of the file
-    end
+  def stop_jobs
+    Redis.new.set("stop_job_#{id}", "true")
+    StopGenerateFramesJob.perform_later(id)
+    logger.info("Stream: Stopped jobs for stream #{id}")
   end
 end
