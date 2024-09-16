@@ -4,7 +4,7 @@ FROM ruby:3.1.0-alpine
 WORKDIR /app
 
 # Install dependencies
-RUN apk add --no-cache build-base sqlite-dev nodejs yarn tzdata git bash ffmpeg
+RUN apk add --no-cache build-base sqlite-dev nodejs yarn tzdata git bash ffmpeg less
 
 # Copy Gemfile and Gemfile.lock
 COPY Gemfile Gemfile.lock ./

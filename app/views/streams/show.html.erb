@@ -1,0 +1,10 @@
+<h1><%= @stream.stream_key %></h1>
+
+<h2>Frames</h2>
+<ul>
+  <% @stream.frames.each do |frame| %>
+    <li>
+      <%= image_tag frame %>
+    </li>
+  <% end %>
+</ul>

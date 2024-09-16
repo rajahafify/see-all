@@ -1,27 +1,40 @@
 class StreamsController < ApplicationController
   skip_before_action :verify_authenticity_token  # Disable CSRF for RTMP callbacks
-  before_action :get_stream_key
+  before_action :get_stream_key, only: [:start, :stop]
+
+  # Index action
+  def index
+    @streams = Stream.all
+  end
+
+  # Show stream
+  def show
+    @stream = Stream.find(params[:id])
+  end
 
   # Authentication logic
   def auth
-    # TODO: Implement proper authentication logic
     render plain: 'OK', status: :ok
   end
 
   # Start stream with real-time analysis
   def start
-    unless valid_stream_key?(stream_key)
-      logger.error "Invalid stream key: #{stream_key}"
-      head :bad_request
-      return
+    return head :bad_request unless valid_stream_key?(stream_key)
+    stream = Stream.new(stream_key: stream_key) # Use stream_key for the Stream instance
+    if stream.save
+      stream.generate_frames_from_stream
+      puts "Stream created successfully: #{stream.inspect}" # Debugging output
+    else
+      puts "Failed to create Stream: #{stream.errors.full_messages}" # Debugging output
     end
-    StreamAnalysisJob.perform_later(stream_key)  # Updated job reference
     render plain: 'OK', status: :ok
   end
 
   # Stop stream
   def stop
-    head :ok
+    @stream = Stream.where(stream_key: stream_key).last
+    @stream.stop_jobs
+    render plain: 'OK', status: :ok
   end
 
   private
@@ -32,7 +45,7 @@ class StreamsController < ApplicationController
   end
 
   def get_stream_key
-    @stream_key = params[:name]
+    @stream_key ||= params[:name]
   end
 
   def stream_key
