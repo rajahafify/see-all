@@ -1,0 +1,45 @@
+see-all/
+├── app/
+│   ├── assets/
+│   │   ├── config/
+│   │   ├── images/
+│   │   └── stylesheets/
+│   ├── channels/
+│   │   └── application_cable/
+│   ├── controllers/
+│   │   └── concerns/
+│   ├── helpers/
+│   ├── javascript/
+│   │   └── controllers/
+│   ├── jobs/
+│   ├── mailers/
+│   ├── models/
+│   │   └── concerns/
+│   ├── services/
+│   └── views/
+│       ├── layouts/
+│       └── streams/
+├── bin/
+├── config/
+│   ├── environments/
+│   ├── initializers/
+│   └── locales/
+├── db/
+│   └── migrate/
+├── documents/
+├── lib/
+│   ├── assets/
+│   └── tasks/
+├── logs/
+├── nginx/
+├── public/
+├── spec/
+│   ├── controllers/
+│   ├── factories/
+│   ├── fixtures/
+│   │   └── images/
+│   ├── models/
+│   └── services/
+├── tmp/
+└── vendor/
+    └── javascript/
