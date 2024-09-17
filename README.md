@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Docker and Docker Compose are required to run the project.
+Docker and Docker Compose are required to run the project. Docker is used for containerization, ensuring consistent environments across different setups, and Docker Compose simplifies the management of multi-container applications.
 
 ### Installing
 
@@ -23,6 +23,7 @@ Docker and Docker Compose are required to run the project.
    ```bash
    docker-compose up --build
    ```
+   After running this command, the application should be available at `http://localhost:3000`.
 
 ## Design Document
 
@@ -69,6 +70,9 @@ See All is built using a microservices architecture with the following main comp
 
 ### Planned Features
 
+1. AI-powered game advice and interaction
+2. Real-time chat between streamer and AI
+
 
 1. AI-powered game advice and interaction
 2. Real-time chat between streamer and AI
@@ -103,3 +107,5 @@ Contributions are welcome! Please follow these guidelines:
 3. Commit your changes.
 4. Push your changes to your fork.
 5. Submit a pull request.
+
+For more detailed guidelines, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
