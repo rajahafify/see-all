@@ -2,17 +2,17 @@ require 'open3'
 require 'shellwords'
 
 class FfmpegService
-  def self.logger
-    @logger ||= Logger.new(STDOUT)
+
+  def initialize(stream)
+    @stream = stream
   end
 
-  def self.generate_frames_from_stream(stream)
-    url = "rtmp://nginx/stream/#{stream.stream_key}"
-    output_directory = "tmp/frames/#{stream.id}"  # Use stream ID to ensure uniqueness
-    FileUtils.mkdir_p(output_directory)    # Create the directory if it doesn't exist
+  def execute
+    generate_frames_from_stream(@stream)
+  end
 
-    GenerateFramesJob.perform_later(stream.id, url, output_directory)
-    AttachFramesJob.perform_later(stream.id, output_directory)
+  def quit
+    stop_jobs(@stream.id)
   end
 
   def self.generate_image_from_frames(stream_id, url, output_directory)
@@ -36,8 +36,7 @@ class FfmpegService
       pid = wait_thr.pid
       Redis.new.set("generate_frames_job_pid_#{stream_id}", pid)
       while line = stdout_and_stderr.gets
-          puts line   
-          puts "GenerateFramesJob: PID: #{pid}"
+          puts line  
       end
   
       # Wait for the process to finish
@@ -62,9 +61,19 @@ class FfmpegService
     end
   end
 
-  def self.stop_jobs(stream_id)
-      Redis.new.set("stop_job_#{stream_id}", "true")
-      StopGenerateFramesJob.perform_later(stream_id)
-      logger.info("Stream: Stopped jobs for stream #{stream_id}")
+  private
+
+  def generate_frames_from_stream(stream)
+    url = "rtmp://nginx/stream/#{stream.stream_key}"
+    output_directory = "tmp/frames/#{stream.id}"  # Use stream ID to ensure uniqueness
+    FileUtils.mkdir_p(output_directory)    # Create the directory if it doesn't exist
+
+    GenerateFramesJob.perform_later(stream.id, url, output_directory)
+    AttachFramesJob.perform_later(stream.id, output_directory)
+  end
+
+  def stop_jobs(stream_id)
+    Redis.new.set("stop_job_#{stream_id}", "true")
+    StopGenerateFramesJob.perform_later(stream_id)
   end
 end

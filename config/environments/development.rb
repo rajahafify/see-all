@@ -77,5 +77,6 @@ Rails.application.configure do
   # Allow the "web" hostname, used by Docker
   config.hosts << "web"
   config.web_console.whitelisted_ips = '172.18.0.0/16'
+  config.default_url_options = { host: 'localhost', port: 3000 }
 
 end
