@@ -35,7 +35,7 @@ See All is built using a microservices architecture with the following main comp
 3. Stream Processing Service
 4. AI Interaction Service
 5. WebSocket Server (Action Cable)
-6. Database (PostgreSQL)
+6. SQlite
 7. Job Queue (Sidekiq + Redis)
 
 ### Key Components
