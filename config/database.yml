@@ -7,7 +7,9 @@ default: &default
 
 development:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
+  database: myapp_development
+  username: postgres
+  password: password
   
 test:
   <<: *default

@@ -5,6 +5,7 @@ class FfmpegService
   def self.logger
     @logger ||= Logger.new(STDOUT)
   end
+
   def self.generate_frames_from_stream(stream)
     url = "rtmp://nginx/stream/#{stream.stream_key}"
     output_directory = "tmp/frames/#{stream.id}"  # Use stream ID to ensure uniqueness
@@ -12,6 +13,37 @@ class FfmpegService
 
     GenerateFramesJob.perform_later(stream.id, url, output_directory)
     AttachFramesJob.perform_later(stream.id, output_directory)
+  end
+
+  def self.generate_image_from_frames(stream_id, url, output_directory)
+    sleep 5 # Wait for the stream to start
+    command = [
+      'ffmpeg',
+      '-i', url,
+      '-vf', 'fps=1,scale=1920:1080',
+      '-vcodec', 'png',
+      '-loglevel', 'repeat+level+verbose',
+      "#{output_directory}/frame_%03d.png"
+    ]
+
+    puts "Stream ID: #{stream_id}"
+    puts "URL: #{url}"
+    puts "Output Directory: #{output_directory}"    
+    puts "Command: #{command}"
+    
+
+    Open3.popen2e(*command) do |stdin, stdout_and_stderr, wait_thr|
+      pid = wait_thr.pid
+      Redis.new.set("generate_frames_job_pid_#{stream_id}", pid)
+      while line = stdout_and_stderr.gets
+          puts line   
+          puts "GenerateFramesJob: PID: #{pid}"
+      end
+  
+      # Wait for the process to finish
+      exit_status = wait_thr.value
+      puts "GenerateFramesJob: Exit status: #{exit_status}"
+    end
   end
 
   def self.attach_generated_frames_to_stream(stream, output_directory)

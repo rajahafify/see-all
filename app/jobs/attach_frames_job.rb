@@ -4,12 +4,11 @@ class AttachFramesJob < ApplicationJob
   def perform(stream_id, output_directory)
     stream = Stream.find(stream_id)
     redis = Redis.new
-    stop_signal = false
+    stop_signal = redis.get("stop_job_#{stream_id}").present?
 
     until stop_signal do
-      stream.attach_generated_frames_to_stream(output_directory)
+      FfmpegService.attach_generated_frames_to_stream(stream, output_directory)
       
-      # Check for stop signal
       stop_signal = redis.get("stop_job_#{stream_id}").present?
       puts "AttachFramesJob: Stop signal: #{stop_signal}"
       
