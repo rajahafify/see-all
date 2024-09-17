@@ -69,13 +69,9 @@ See All is built using a microservices architecture with the following main comp
 
 ### Planned Features
 
-1. User authentication and stream key management
-2. Real-time video streaming using OBS
-3. Automatic game detection from video streams
-4. AI-powered game advice and interaction
-5. Real-time chat between streamer and AI
-6. Stream recording and playback
-7. Analytics dashboard for streamers
+
+1. AI-powered game advice and interaction
+2. Real-time chat between streamer and AI
 
 ### Data Flow
 
@@ -92,8 +88,8 @@ See All is built using a microservices architecture with the following main comp
 - Backend: Ruby on Rails
 - Frontend: HTML, CSS, JavaScript (with Stimulus.js)
 - Streaming: Nginx-RTMP
-- AI Integration: OpenAI GPT API (or similar)
-- Database: PostgreSQL
+- AI Integration: Anthropic API
+- Database: SQlite
 - Job Queue: Sidekiq
 - Caching: Redis
 - Containerization: Docker
