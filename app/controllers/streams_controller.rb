@@ -23,9 +23,9 @@ class StreamsController < ApplicationController
     stream = Stream.new(stream_key: stream_key) # Use stream_key for the Stream instance
     if stream.save
       stream.generate_frames_from_stream
-      puts "Stream created successfully: #{stream.inspect}" # Debugging output
+      logger.info "Stream #{stream.stream_key} started"
     else
-      puts "Failed to create Stream: #{stream.errors.full_messages}" # Debugging output
+      logger.error "Error starting stream #{stream.stream_key}: #{stream.errors.full_messages}"
     end
     render plain: 'OK', status: :ok
   end
