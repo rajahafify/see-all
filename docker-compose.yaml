@@ -23,8 +23,10 @@ services:
       - "3000:3000"
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/myapp_development
     depends_on:
       - redis
+      - postgres
     networks:
       - my_network
     develop:
@@ -33,13 +35,13 @@ services:
           target: /app
           ignore:
             - node_modules/
-          action: sync  # Added action here
+          action: sync
         - path: Gemfile
           target: /app/Gemfile
-          action: sync  # Added action here
+          action: sync
         - path: Gemfile.lock
           target: /app/Gemfile.lock
-          action: sync  # Added action here
+          action: sync
 
   sidekiq:
     build: .
@@ -50,8 +52,10 @@ services:
       - ./db:/app/db
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/myapp_development
     depends_on:
       - redis
+      - postgres
     networks:
       - my_network
     develop:
@@ -60,19 +64,35 @@ services:
           target: /app
           ignore:
             - node_modules/
-          action: sync  # Added action here
+          action: sync
         - path: Gemfile
           target: /app/Gemfile
-          action: sync  # Added action here
+          action: sync
         - path: Gemfile.lock
           target: /app/Gemfile.lock
-          action: sync  # Added action here
+          action: sync
 
   redis:
     image: redis:6-alpine
     networks:
       - my_network
       
+  postgres:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: myapp_development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+
 networks:
   my_network:
     driver: bridge
+
+volumes:
+  postgres_data:
