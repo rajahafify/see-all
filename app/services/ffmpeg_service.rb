@@ -2,6 +2,9 @@ require 'open3'
 require 'shellwords'
 
 class FfmpegService
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
   def self.generate_frames_from_stream(stream)
     url = "rtmp://nginx/stream/#{stream.stream_key}"
     output_directory = "tmp/frames/#{stream.id}"  # Use stream ID to ensure uniqueness
@@ -30,5 +33,6 @@ class FfmpegService
   def self.stop_jobs(stream_id)
       Redis.new.set("stop_job_#{stream_id}", "true")
       StopGenerateFramesJob.perform_later(stream_id)
+      logger.info("Stream: Stopped jobs for stream #{stream_id}")
   end
 end
