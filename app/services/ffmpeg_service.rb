@@ -26,4 +26,11 @@ class FfmpegService
       end
     end
   end
+
+  def self.stop_jobs(stream_id)
+      Redis.new.set("stop_job_#{id}", "true")
+      StopGenerateFramesJob.perform_later(stream_id)
+      logger.info("Stream: Stopped jobs for stream #{stream_id}")
+    end
+  end
 end
