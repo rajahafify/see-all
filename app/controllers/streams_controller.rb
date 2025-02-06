@@ -19,30 +19,25 @@ class StreamsController < ApplicationController
 
   # Start stream with real-time analysis
   def start
-    return head :bad_request unless valid_stream_key?(stream_key)
-    stream = Stream.new(stream_key: stream_key) # Use stream_key for the Stream instance
-    if stream.save
-      stream.generate_frames_from_stream
-      logger.info "Stream #{stream.stream_key} started"
+    service = StreamStartService.new(stream_key)
+    if service.valid_stream_key?
+      service.start_stream
+      logger.info "Stream #{stream_key} started"
+      render plain: 'OK', status: :ok
     else
-      logger.error "Error starting stream #{stream.stream_key}: #{stream.errors.full_messages}"
+      logger.error "Error starting stream #{stream_key}"
+      render plain: 'Error', status: :bad_request
     end
-    render plain: 'OK', status: :ok
   end
 
   # Stop stream
   def stop
-    @stream = Stream.where(stream_key: stream_key).last
-    @stream.stop_jobs
+    service = StreamStopService.new(stream_key)
+    service.stop_stream
     render plain: 'OK', status: :ok
   end
 
   private
-
-  # Check if stream key is valid
-  def valid_stream_key?(stream_key)
-    stream_key == 'test_stream' 
-  end
 
   def get_stream_key
     @stream_key ||= params[:name]

@@ -3,8 +3,9 @@ require 'shellwords'
 
 class FfmpegService
 
-  def initialize(stream)
+  def initialize(stream, redis_client = Redis.new)
     @stream = stream
+    @redis = redis_client
   end
 
   def execute
@@ -17,14 +18,7 @@ class FfmpegService
 
   def self.generate_image_from_frames(stream_id, url, output_directory)
     sleep 5 # Wait for the stream to start
-    command = [
-      'ffmpeg',
-      '-i', url,
-      '-vf', 'fps=1,scale=1920:1080',
-      '-vcodec', 'png',
-      '-loglevel', 'repeat+level+verbose',
-      "#{output_directory}/frame_%03d.png"
-    ]
+    command = build_ffmpeg_command(url, output_directory)
 
     puts "Stream ID: #{stream_id}"
     puts "URL: #{url}"
@@ -73,7 +67,18 @@ class FfmpegService
   end
 
   def stop_jobs(stream_id)
-    Redis.new.set("stop_job_#{stream_id}", "true")
+    @redis.set("stop_job_#{stream_id}", "true")
     StopGenerateFramesJob.perform_later(stream_id)
+  end
+
+  def self.build_ffmpeg_command(url, output_directory)
+    [
+      'ffmpeg',
+      '-i', url,
+      '-vf', 'fps=1,scale=1920:1080',
+      '-vcodec', 'png',
+      '-loglevel', 'repeat+level+verbose',
+      "#{output_directory}/frame_%03d.png"
+    ]
   end
 end
