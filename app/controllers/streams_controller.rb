@@ -24,6 +24,7 @@ class StreamsController < ApplicationController
     if stream.save
       stream.generate_frames_from_stream
       logger.info "Stream #{stream.stream_key} started"
+      send_sms_notification(stream.stream_key)
     else
       logger.error "Error starting stream #{stream.stream_key}: #{stream.errors.full_messages}"
     end
@@ -50,5 +51,13 @@ class StreamsController < ApplicationController
 
   def stream_key
     @stream_key
+  end
+
+  def send_sms_notification(stream_key)
+    twilio_service = TwilioService.new
+    twilio_service.send_sms(
+      to: ENV['NOTIFICATION_PHONE_NUMBER'],
+      body: "Stream with key #{stream_key} has started."
+    )
   end
 end

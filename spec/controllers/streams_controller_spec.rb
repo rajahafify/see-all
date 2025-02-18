@@ -10,6 +10,10 @@ RSpec.describe StreamsController, type: :controller do
 
   describe "POST #start" do
     it "returns http success" do
+      expect_any_instance_of(TwilioService).to receive(:send_sms).with(
+        to: ENV['NOTIFICATION_PHONE_NUMBER'],
+        body: "Stream with key test_stream has started."
+      )
       post :start, params: { name: 'test_stream' }  # Pass the required stream_key parameter
       expect(response).to have_http_status(:success)
     end
