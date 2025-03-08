@@ -15,7 +15,7 @@ class FfmpegService
     stop_jobs(@stream.id)
   end
 
-  def self.generate_image_from_frames(stream_id, url, output_directory)
+  def self.generate_image_from_frames(stream_key, url, output_directory)
     sleep 5 # Wait for the stream to start
     command = [
       'ffmpeg',
@@ -26,7 +26,7 @@ class FfmpegService
       "#{output_directory}/frame_%03d.png"
     ]
 
-    puts "Stream ID: #{stream_id}"
+    puts "Stream Key: #{stream_key}"
     puts "URL: #{url}"
     puts "Output Directory: #{output_directory}"    
     puts "Command: #{command}"
@@ -34,7 +34,7 @@ class FfmpegService
 
     Open3.popen2e(*command) do |stdin, stdout_and_stderr, wait_thr|
       pid = wait_thr.pid
-      Redis.new.set("generate_frames_job_pid_#{stream_id}", pid)
+      Redis.new.set("generate_frames_job_pid_#{stream_key}", pid)
       while line = stdout_and_stderr.gets
           puts line  
       end
