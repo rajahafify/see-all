@@ -19,8 +19,8 @@ class StreamsController < ApplicationController
 
   # Start stream with real-time analysis
   def start
-    return head :bad_request unless valid_stream_key?(stream_key)
-    stream = Stream.new(stream_key: stream_key) # Use stream_key for the Stream instance
+    return head :bad_request unless valid_stream_key?(@stream_key)
+    stream = Stream.new(stream_key: @stream_key) # Use stream_key for the Stream instance
     if stream.save
       stream.generate_frames_from_stream
       logger.info "Stream #{stream.stream_key} started"
@@ -32,7 +32,7 @@ class StreamsController < ApplicationController
 
   # Stop stream
   def stop
-    @stream = Stream.where(stream_key: stream_key).last
+    @stream = Stream.where(stream_key: @stream_key).last
     @stream.stop_jobs
     render plain: 'OK', status: :ok
   end
@@ -40,8 +40,8 @@ class StreamsController < ApplicationController
   private
 
   # Check if stream key is valid
-  def valid_stream_key?(stream_key)
-    stream_key == 'test_stream' 
+  def valid_stream_key?(@stream_key)
+    @stream_key == 'test_stream' 
   end
 
   def get_stream_key
